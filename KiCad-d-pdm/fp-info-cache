@@ -1,4 +1,4 @@
-26795563182107428
+26799106640969369
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -73506,6 +73506,20 @@ net tie
 0
 4
 4
+OLED
+SSD1306-0.91-OLED-4pin-128x32
+
+
+0
+4
+4
+OLED
+SSD1306-128x64_OLED
+
+
+0
+0
+0
 OPL
 XIAO-Add-On
 
