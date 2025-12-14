@@ -79,7 +79,9 @@ class JsonAPI(Extension):
     def before_matrix_scan(self, keyboard):
         if serial.in_waiting:
             try:
-                msg = json.loads(serial.readline())
+                # serial.readline() returns bytes; decode before json parsing
+                raw = serial.readline()
+                msg = json.loads(raw.decode())
                 self.handle_cmd(msg)
             except Exception:
                 self.send({"type": "err", "cmd": "unknown", "reason": "json"})
@@ -88,16 +90,36 @@ class JsonAPI(Extension):
         t = msg.get("type")
         try:
             if t == "led":
-                status_leds[msg["index"]].value = bool(msg["value"])
+                idx = int(msg.get("index", -1))
+                val = bool(msg.get("value", False))
+                if 0 <= idx < len(status_leds):
+                    status_leds[idx].value = val
+                else:
+                    raise ValueError("bad_led_index")
             elif t == "rgb":
-                rgb.set_pixel(msg["index"], (msg["r"], msg["g"], msg["b"]))
-                rgb.show()
+                idx = int(msg.get("index", -1))
+                r = int(msg.get("r", 0))
+                g = int(msg.get("g", 0))
+                b = int(msg.get("b", 0))
+                if 0 <= idx < rgb.num_pixels:
+                    rgb.set_pixel(idx, (r, g, b))
+                    rgb.show()
+                else:
+                    raise ValueError("bad_rgb_index")
             elif t == "rgb_all":
-                for i in range(16):
-                    rgb.set_pixel(i, (msg["r"], msg["g"], msg["b"]))
+                r = int(msg.get("r", 0))
+                g = int(msg.get("g", 0))
+                b = int(msg.get("b", 0))
+                for i in range(rgb.num_pixels):
+                    rgb.set_pixel(i, (r, g, b))
                 rgb.show()
             elif t == "oled":
-                display.entries[msg["line"]].text = msg["text"]
+                line = int(msg.get("line", -1))
+                text = str(msg.get("text", ""))
+                if 0 <= line < len(display.entries):
+                    display.entries[line].text = text
+                else:
+                    raise ValueError("bad_oled_line")
             elif t == "oled_clear":
                 for e in display.entries:
                     e.text = ""
