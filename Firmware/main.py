@@ -86,17 +86,64 @@ class JsonAPI(Extension):
 
     def handle_cmd(self, msg):
         t = msg.get("type")
-        if t == "led":
-            status_leds[msg["index"]].value = bool(msg["value"])
-        elif t == "rgb":
-            rgb.set_pixel(msg["index"], (msg["r"], msg["g"], msg["b"]))
-            rgb.show()
-        elif t == "rgb_all":
-            for i in range(16):
-                rgb.set_pixel(i, (msg["r"], msg["g"], msg["b"]))
-            rgb.show()
-        elif t == "oled":
-            display.entries[msg["line"]].text = msg["text"]
+        try:
+            if t == "led":
+                status_leds[msg["index"]].value = bool(msg["value"])
+            elif t == "rgb":
+                rgb.set_pixel(msg["index"], (msg["r"], msg["g"], msg["b"]))
+                rgb.show()
+            elif t == "rgb_all":
+                for i in range(16):
+                    rgb.set_pixel(i, (msg["r"], msg["g"], msg["b"]))
+                rgb.show()
+            elif t == "oled":
+                display.entries[msg["line"]].text = msg["text"]
+            elif t == "oled_clear":
+                for e in display.entries:
+                    e.text = ""
+            else:
+                raise ValueError("unknown_cmd")
 
+
+            self.send({"type": "ack", "cmd": t})
+
+
+        except Exception:
+            self.send({"type": "err", "cmd": t, "reason": "bad_args"})
+
+def on_key_event(self, keyboard, key, is_pressed):
+    if key:
+        self.send({
+            "type": "key",
+            "row": key.row,
+            "col": key.col,
+            "state": "press" if is_pressed else "release",
+        })
+
+
+    def on_encoder_turn(self, keyboard, encoder_id, direction):
+        self.send({
+            "type": "encoder",
+            "id": encoder_id,
+            "delta": direction,
+        })
+
+
+    def on_encoder_press(self, keyboard, encoder_id, is_pressed):
+        self.send({
+            "type": "encoder_btn",
+            "id": encoder_id,
+            "state": "press" if is_pressed else "release",
+        })
+
+
+keyboard.extensions.append(JsonAPI())
+
+
+serial.write(json.dumps({
+    "type": "boot",
+    "api": API_VERSION,
+    "status": "ready",
+}).encode() + b"\n")
 
 keyboard.go()
