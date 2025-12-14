@@ -111,14 +111,14 @@ class JsonAPI(Extension):
         except Exception:
             self.send({"type": "err", "cmd": t, "reason": "bad_args"})
 
-def on_key_event(self, keyboard, key, is_pressed):
-    if key:
-        self.send({
-            "type": "key",
-            "row": key.row,
-            "col": key.col,
-            "state": "press" if is_pressed else "release",
-        })
+    def on_key_event(self, keyboard, key, is_pressed):
+        if key:
+            self.send({
+                "type": "key",
+                "row": key.row,
+                "col": key.col,
+                "state": "press" if is_pressed else "release",
+            })
 
 
     def on_encoder_turn(self, keyboard, encoder_id, direction):
