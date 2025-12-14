@@ -4,6 +4,14 @@
 	(generator_version "9.0")
 	(uuid "66edd3ad-38ca-4c07-a593-f5c36c845920")
 	(paper "A4")
+	(title_block
+		(title "KiCad-Diynamic-Project-Disply-Modul")
+		(date "2025-12-14")
+		(rev "1.0")
+		(company "@Apfelholz")
+		(comment 1 "This project implements a custom RP2040-based macro pad.")
+		(comment 2 "It is designed as a programmable input and status device.")
+	)
 	(lib_symbols
 		(symbol "Connector:Conn_01x02_Pin"
 			(pin_names
